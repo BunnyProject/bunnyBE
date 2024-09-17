@@ -3,10 +3,9 @@ package bunny.backend.member.controller;
 import bunny.backend.common.ApiResponse;
 import bunny.backend.member.dto.request.CheckMemberNameRequest;
 import bunny.backend.member.dto.response.CheckMemberNameResponse;
+import bunny.backend.member.dto.response.FindMemberNameResponse;
 import bunny.backend.member.service.MemberService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class MemberController {
@@ -22,6 +21,13 @@ public class MemberController {
             @RequestBody CheckMemberNameRequest request
     ) {
         return memberService.checkMemberName(request);
+    }
+    // 이름으로 사용자 조회
+    @GetMapping("/user/find")
+    public ApiResponse<FindMemberNameResponse> findMember(
+            @RequestParam(name = "name") String name
+    ){
+        return memberService.findMember(name);
     }
 
 }
