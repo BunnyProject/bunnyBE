@@ -40,4 +40,11 @@ public class MemberController {
     ) {
         return memberService.createMember(request);
     }
+
+    // 사용자 삭제
+    @DeleteMapping("/user/{id}")
+    public ApiResponse<String> deleteMember(@PathVariable("id") Long id) {
+        memberService.deleteMember(id);
+        return ApiResponse.success("Member deleted: " + id);
+    }
 }

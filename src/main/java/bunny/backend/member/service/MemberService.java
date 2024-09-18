@@ -58,4 +58,8 @@ public class MemberService {
         memberRepository.save(member);
         return ApiResponse.success(new CreateMemberResponse(member.getMemberName().getName(), member.getId()));
     }
+    // 유저 삭제
+    public void deleteMember(Long id) {
+        memberRepository.deleteById(id);
+    }
 }

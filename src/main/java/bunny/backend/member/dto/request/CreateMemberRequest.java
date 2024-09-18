@@ -5,7 +5,6 @@ import bunny.backend.member.domain.Job;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -16,6 +15,6 @@ public record CreateMemberRequest(
         Job job,
         long money,
         List<DayOfWeek> workDay,
-        LocalDateTime workingTime,
-        LocalDateTime quittingTime
+        LocalTime workingTime,
+        LocalTime quittingTime
 ) {}

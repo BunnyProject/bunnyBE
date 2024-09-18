@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -43,12 +43,12 @@ public class Member extends BaseEntity {
     private List<DayOfWeek> workDay;
 
     @Column(name = "working_time", nullable = false)
-    private LocalDateTime workingTime;
+    private LocalTime workingTime;
 
     @Column(name = "quitting_time", nullable = false)
-    private LocalDateTime quittingTime;
+    private LocalTime quittingTime;
 
-    public Member(String name, LocalDate birth, Gender gender, Job job, Long money, List<DayOfWeek> workDay, LocalDateTime workingTime, LocalDateTime quittingTime) {
+    public Member(String name, LocalDate birth, Gender gender, Job job, Long money, List<DayOfWeek> workDay, LocalTime workingTime, LocalTime quittingTime) {
         this.memberName = new MemberName(name);
         this.birth = birth;
         this.gender = gender;
