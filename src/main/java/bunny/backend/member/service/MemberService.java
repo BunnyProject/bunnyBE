@@ -6,7 +6,9 @@ import bunny.backend.member.domain.Member;
 import bunny.backend.member.domain.MemberName;
 import bunny.backend.member.domain.MemberRepository;
 import bunny.backend.member.dto.request.CheckMemberNameRequest;
+import bunny.backend.member.dto.request.CreateMemberRequest;
 import bunny.backend.member.dto.response.CheckMemberNameResponse;
+import bunny.backend.member.dto.response.CreateMemberResponse;
 import bunny.backend.member.dto.response.FindMemberNameResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -39,5 +41,21 @@ public class MemberService {
             throw new BunnyException("존재하지 않는 이름입니다.", HttpStatus.BAD_REQUEST);
         }
         return ApiResponse.success(new FindMemberNameResponse(member.getId(), member.getMemberName().getName()));
+    }
+    // 유저 생성
+    public ApiResponse<CreateMemberResponse> createMember(CreateMemberRequest request) {
+        checkMemberName(request.name());
+        Member member = new Member(
+                request.name(),
+                request.birth(),
+                request.gender(),
+                request.job(),
+                request.money(),
+                request.workDay(),
+                request.workingTime(),
+                request.quittingTime()
+        );
+        memberRepository.save(member);
+        return ApiResponse.success(new CreateMemberResponse(member.getMemberName().getName(), member.getId()));
     }
 }

@@ -48,5 +48,14 @@ public class Member extends BaseEntity {
     @Column(name = "quitting_time", nullable = false)
     private LocalDateTime quittingTime;
 
-
+    public Member(String name, LocalDate birth, Gender gender, Job job, Long money, List<DayOfWeek> workDay, LocalDateTime workingTime, LocalDateTime quittingTime) {
+        this.memberName = new MemberName(name);
+        this.birth = birth;
+        this.gender = gender;
+        this.job = job;
+        this.money = money;
+        this.workDay = workDay;
+        this.workingTime = workingTime;
+        this.quittingTime = quittingTime;
+    }
 }
