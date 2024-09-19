@@ -50,7 +50,7 @@ public class MemberService {
                 request.birth(),
                 request.gender(),
                 request.job(),
-                request.money(),
+                request.monthMoney(),
                 request.workDay(),
                 request.workingTime(),
                 request.quittingTime()

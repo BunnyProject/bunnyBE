@@ -1,6 +1,7 @@
 package bunny.backend.member.domain;
 
 import bunny.backend.common.BaseEntity;
+import bunny.backend.salary.domain.Salary;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,8 +34,12 @@ public class Member extends BaseEntity {
     @Column(name = "job", nullable = false)
     private Job job;
 
-    @Column(name = "money", nullable = false)
-    private Long money;
+    @Column(name = "month_money",nullable = false)
+    private double monthMoney;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "salary_id")
+    private Salary salary;
 
     @ElementCollection(targetClass = DayOfWeek.class)
     @CollectionTable(name = "work_day", joinColumns = @JoinColumn(name = "member_id"))
@@ -48,12 +53,12 @@ public class Member extends BaseEntity {
     @Column(name = "quitting_time", nullable = false)
     private LocalTime quittingTime;
 
-    public Member(String name, LocalDate birth, Gender gender, Job job, Long money, List<DayOfWeek> workDay, LocalTime workingTime, LocalTime quittingTime) {
+    public Member(String name, LocalDate birth, Gender gender, Job job, double monthMoney, List<DayOfWeek> workDay, LocalTime workingTime, LocalTime quittingTime) {
         this.memberName = new MemberName(name);
         this.birth = birth;
         this.gender = gender;
         this.job = job;
-        this.money = money;
+        this.monthMoney = monthMoney;
         this.workDay = workDay;
         this.workingTime = workingTime;
         this.quittingTime = quittingTime;

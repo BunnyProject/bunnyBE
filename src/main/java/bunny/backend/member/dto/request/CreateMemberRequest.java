@@ -13,7 +13,7 @@ public record CreateMemberRequest(
         LocalDate birth,
         Gender gender,
         Job job,
-        long money,
+        double monthMoney,
         List<DayOfWeek> workDay,
         LocalTime workingTime,
         LocalTime quittingTime
