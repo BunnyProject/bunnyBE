@@ -37,6 +37,7 @@ public class SalaryService {
                 minMoney,
                 secondMoney
         );
+        salary.setMember(findMember);
         salaryRepository.save(salary);
 
         MoneyShowResponse response = new MoneyShowResponse(

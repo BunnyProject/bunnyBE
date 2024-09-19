@@ -37,10 +37,6 @@ public class Member extends BaseEntity {
     @Column(name = "month_money",nullable = false)
     private double monthMoney;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "salary_id")
-    private Salary salary;
-
     @ElementCollection(targetClass = DayOfWeek.class)
     @CollectionTable(name = "work_day", joinColumns = @JoinColumn(name = "member_id"))
     @Column(name = "work_day")

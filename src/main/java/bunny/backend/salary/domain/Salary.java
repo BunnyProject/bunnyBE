@@ -1,5 +1,6 @@
 package bunny.backend.salary.domain;
 
+import bunny.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,18 +13,28 @@ public class Salary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "month_money")
     private double monthMoney;
+
     @Column(name = "week_money")
     private double weekMoney;
+
     @Column(name = "day_money")
     private double dayMoney;
+
     @Column(name = "hour_money")
     private double hourMoney;
+
     @Column(name = "min_money")
     private double minMoney;
+
     @Column(name = "second_money")
     private double secondMoney;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id",unique = true)
+    private Member member;
 
     public Salary(double monthMoney, double weekMoney, double dayMoney, double hourMoney, double minMoney, double secondMoney) {
         this.monthMoney = monthMoney;
@@ -34,4 +45,7 @@ public class Salary {
         this.secondMoney = secondMoney;
     }
 
+    public void setMember(Member member) {
+        this.member = member;
+    }
 }
