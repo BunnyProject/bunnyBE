@@ -59,4 +59,5 @@ public class Member extends BaseEntity {
         this.workingTime = workingTime;
         this.quittingTime = quittingTime;
     }
+
 }
