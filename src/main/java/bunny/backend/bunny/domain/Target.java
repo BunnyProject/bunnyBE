@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "target")
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Target extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
