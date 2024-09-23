@@ -1,5 +1,6 @@
 package bunny.backend.salary.domain;
 
+import bunny.backend.common.BaseEntity;
 import bunny.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "salary")
-public class Salary {
+public class Salary extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,7 +34,7 @@ public class Salary {
     private double secondMoney;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id",unique = true)
+    @JoinColumn(name = "member_id",unique = true) // member_id가 unique값 가지므로 한명에 대해 여러번 조회 불가능
     private Member member;
 
     public Salary(double monthMoney, double weekMoney, double dayMoney, double hourMoney, double minMoney, double secondMoney) {
