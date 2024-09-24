@@ -18,9 +18,6 @@ public class Target extends BaseEntity {
     @Column(name = "total_target_amount")
     private Long totalTargetAmout;
 
-    @Column(name = "target_amount")
-    private Long targetAmout;
-
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id",unique = true) // member_id가 unique값 가지므로 한명에 대해 여러번 조회 불가능
     private Member member;

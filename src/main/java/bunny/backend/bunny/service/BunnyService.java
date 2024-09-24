@@ -35,7 +35,8 @@ public class BunnyService {
             Category category = new Category(
                     target.categoryName(),
                     target.onePrice(),
-                    findMember
+                    findMember,
+                    target.targetAmount()
             );
             targetList.add(category);
         }
@@ -49,11 +50,8 @@ public class BunnyService {
         for (Category category : targetList) {
             TargetList targetDto = new TargetList(
                     category.getCategoryName(),
-                    category.getOnePrice(),
-                    request.targetList().stream()
-                            .filter(t -> t.categoryName().equals(category.getCategoryName()))
-                            .findFirst().orElseThrow(() -> new BunnyException("해당 카테고리를 찾을 수 없어요.", HttpStatus.BAD_REQUEST))
-                            .targetAmount()
+                    category.getTargetAmout(), // targetAmount 가져오기
+                    category.getOnePrice()
             );
             targetListDto.add(targetDto);
         }
