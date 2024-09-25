@@ -1,8 +1,10 @@
 package bunny.backend.bunny.controller;
 
 import bunny.backend.bunny.dto.request.MonthTargetRequest;
+import bunny.backend.bunny.dto.request.UpdateMonthTargetRequest;
 import bunny.backend.bunny.dto.response.MonthTargetResponse;
 import bunny.backend.bunny.dto.response.TodayResponse;
+import bunny.backend.bunny.dto.response.UpdateMonthTargetResponse;
 import bunny.backend.bunny.service.BunnyService;
 import bunny.backend.common.ApiResponse;
 import org.springframework.web.bind.annotation.*;
@@ -25,5 +27,11 @@ public class BunnyController {
     public ApiResponse<TodayResponse> todayBunny(
             @RequestHeader("member-no") Long memberId) {
         return bunnyService.todayBunny(memberId);
+    }
+    // 한달 목표 수정
+    @PutMapping("/bunny")
+    public ApiResponse<UpdateMonthTargetResponse> updateMonthTarget(@RequestHeader("member-no")Long memberId,
+                                                                    @RequestBody UpdateMonthTargetRequest request) {
+        return bunnyService.updateMonthTarget(memberId,request);
     }
 }
