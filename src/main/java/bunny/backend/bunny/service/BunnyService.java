@@ -6,6 +6,7 @@ import bunny.backend.bunny.domain.TargetRepository;
 import bunny.backend.bunny.dto.process.TargetList;
 import bunny.backend.bunny.dto.request.MonthTargetRequest;
 import bunny.backend.bunny.dto.response.MonthTargetResponse;
+import bunny.backend.bunny.dto.response.TodayResponse;
 import bunny.backend.common.ApiResponse;
 import bunny.backend.exception.BunnyException;
 import bunny.backend.member.domain.Member;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +52,7 @@ public class BunnyService {
         for (Category category : targetList) {
             TargetList targetDto = new TargetList(
                     category.getCategoryName(),
-                    category.getTargetAmout(), // targetAmount 가져오기
+                    category.getTargetAmout(),
                     category.getOnePrice()
             );
             targetListDto.add(targetDto);
@@ -58,5 +60,12 @@ public class BunnyService {
 
         targetRepository.save(target);
         return ApiResponse.success(new MonthTargetResponse(targetListDto));
+    }
+    // 오늘의 버니 조회
+    public ApiResponse<TodayResponse> todayBunny(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
+        LocalTime quttingTime = findMember.getQuittingTime();
+        return ApiResponse.success(new TodayResponse(quttingTime));
     }
 }
