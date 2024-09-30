@@ -27,8 +27,8 @@ public class Category extends BaseEntity {
     @Column(name = "target_amount")
     private Long targetAmount;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id",unique = true)
     private Member member;
 
     public Category(String categoryName, Long onePrice, Member member,Long targetAmount) {
@@ -39,5 +39,8 @@ public class Category extends BaseEntity {
     }
     public void setTargetAmount(Long targetAmount) {
         this.targetAmount = targetAmount;
+    }
+    public void setOnePrice(Long onePrice) {
+        this.onePrice = onePrice;
     }
 }

@@ -1,11 +1,13 @@
 package bunny.backend.bunny.service;
 
 import bunny.backend.bunny.domain.Category;
+import bunny.backend.bunny.domain.CategoryRepository;
 import bunny.backend.bunny.domain.Target;
 import bunny.backend.bunny.domain.TargetRepository;
 import bunny.backend.bunny.dto.process.TargetList;
 import bunny.backend.bunny.dto.request.MonthTargetRequest;
 import bunny.backend.bunny.dto.request.UpdateMonthTargetRequest;
+import bunny.backend.bunny.dto.response.DeleteTargetResponse;
 import bunny.backend.bunny.dto.response.MonthTargetResponse;
 import bunny.backend.bunny.dto.response.TodayResponse;
 import bunny.backend.bunny.dto.response.UpdateMonthTargetResponse;
@@ -22,16 +24,18 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class BunnyService {
     private final TargetRepository targetRepository;
     private final MemberRepository memberRepository;
+    private final CategoryRepository categoryRepository;
 
     // 이번달 목표 설정
     @Transactional
-    public ApiResponse<MonthTargetResponse> monthTarget(Long memberId,MonthTargetRequest request) {
+    public ApiResponse<MonthTargetResponse> monthTarget(Long memberId, MonthTargetRequest request) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
@@ -48,12 +52,12 @@ public class BunnyService {
 
         Target target = new Target();
         target.setTotalTargetAmount(request.totalTargetAmount());
-        target.setTargetList(targetList);
         target.setMember(findMember);
 
         List<TargetList> targetListDto = new ArrayList<>();
         for (Category category : targetList) {
             TargetList targetDto = new TargetList(
+                    category.getId(),
                     category.getCategoryName(),
                     category.getTargetAmount(),
                     category.getOnePrice()
@@ -64,6 +68,7 @@ public class BunnyService {
         targetRepository.save(target);
         return ApiResponse.success(new MonthTargetResponse(targetListDto));
     }
+
     // 오늘의 버니 조회
     public ApiResponse<TodayResponse> todayBunny(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
@@ -71,45 +76,62 @@ public class BunnyService {
         LocalTime quttingTime = findMember.getQuittingTime();
         return ApiResponse.success(new TodayResponse(quttingTime));
     }
+
     // 버니 목표 수정
-    public ApiResponse<UpdateMonthTargetResponse> updateMonthTarget(Long memberId,UpdateMonthTargetRequest request) {
+    @Transactional
+    public ApiResponse<UpdateMonthTargetResponse> updateMonthTarget(Long memberId, UpdateMonthTargetRequest request) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
         Target findTarget = targetRepository.findById(request.targetId())
-                .orElseThrow(() -> new BunnyException("이번달 목표를 찾을 수 없어요",HttpStatus.NOT_FOUND));
-        // 해당 회원의 한달목표가 맞는지 확인
-        checkMemberRelationMonthTarget(findMember,findTarget);
+                .orElseThrow(() -> new BunnyException("이번달 목표를 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
-        findTarget.setTotalTargetAmount(request.totalTargetAmount());
+        // 해당 회원의 한달 목표 확인
+        checkMemberRelationMonthTarget(findMember, findTarget);
 
         List<Category> updatedCategoryList = new ArrayList<>();
-        for (TargetList target : request.targetList()) {
-            Category updatedCategory = new Category(
-                    target.categoryName(),
-                    target.onePrice(),
-                    findMember,
-                    target.targetAmount()
-            );
-            updatedCategory.setTargetAmount(target.targetAmount());
-            updatedCategoryList.add(updatedCategory);
+
+        for (TargetList updateTarget : request.targetList()) {
+
+            List<Category> existingCategories = categoryRepository.findByMemberId(updateTarget.memberId());
+
+            Category existingCategory = existingCategories.stream()
+                    .filter(category -> Objects.equals(category.getMember().getId(), updateTarget.memberId()))
+                    .findFirst()
+                    .orElseThrow(() -> new BunnyException("존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND));
+
+            existingCategory.setTargetAmount(updateTarget.targetAmount());
+            existingCategory.setOnePrice(updateTarget.onePrice());
+
+
+            categoryRepository.save(existingCategory);
+            updatedCategoryList.add(existingCategory);
         }
 
-        findTarget.setTargetList(updatedCategoryList);
+        List<TargetList> targetListDto = updatedCategoryList.stream()
+                .map(category -> new TargetList(
+                        category.getMember().getId(),
+                        category.getCategoryName(),
+                        category.getTargetAmount(),
+                        category.getOnePrice()))
+                .collect(Collectors.toList());
 
-        targetRepository.save(findTarget);
+        return ApiResponse.success(new UpdateMonthTargetResponse(updatedCategoryList.getFirst().getTargetAmount(), targetListDto));
+    }
 
-        List<TargetList> targetListDto = new ArrayList<>();
-        for (Category category : updatedCategoryList) {
-            TargetList targetDto = new TargetList(
-                    category.getCategoryName(),
-                    category.getTargetAmount(),
-                    category.getOnePrice()
-            );
-            targetListDto.add(targetDto);
-        }
+    // 목표 삭제
+    public ApiResponse<DeleteTargetResponse> deleteTarget(Long memberId, Long targetId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
-        return ApiResponse.success(new UpdateMonthTargetResponse( findTarget.getTotalTargetAmount(),targetListDto));
+        Target findTarget = targetRepository.findById(targetId)
+                .orElseThrow(() -> new BunnyException("이번달 목표를 찾을 수 없어요.", HttpStatus.NOT_FOUND));
+
+        checkMemberRelationMonthTarget(findMember, findTarget);
+
+        targetRepository.deleteById(targetId);
+
+        return ApiResponse.success(new DeleteTargetResponse("한달 목표가 삭제 됐습니다.", targetId));
     }
 
     private static void checkMemberRelationMonthTarget(Member findMember, Target findTarget) {
