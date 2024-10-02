@@ -25,16 +25,24 @@ public class Category extends BaseEntity {
     private Long onePrice;
 
     @Column(name = "target_amount")
-    private Long targetAmout;
+    private Long targetAmount;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id",unique = true)
     private Member member;
 
-    public Category(String categoryName, Long onePrice, Member member,Long targetAmout) {
+    public Category(String categoryName, Long onePrice, Member member,Long targetAmount) {
         this.categoryName = categoryName;
         this.onePrice = onePrice;
         this.member = member;
-        this.targetAmout = targetAmout;
+        this.targetAmount = targetAmount;
     }
+    public void setTargetAmount(Long targetAmount) {
+        this.targetAmount = targetAmount;
+    }
+    public void setOnePrice(Long onePrice) {
+        this.onePrice = onePrice;
+    }
+
+    public void setCategoryName(String categoryName) {this.categoryName = categoryName;}
 }
