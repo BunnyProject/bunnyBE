@@ -8,14 +8,13 @@ import bunny.backend.bunny.dto.process.TargetList;
 import bunny.backend.bunny.dto.process.UpdateTargetList;
 import bunny.backend.bunny.dto.request.MonthTargetRequest;
 import bunny.backend.bunny.dto.request.UpdateMonthTargetRequest;
-import bunny.backend.bunny.dto.response.DeleteTargetResponse;
-import bunny.backend.bunny.dto.response.MonthTargetResponse;
-import bunny.backend.bunny.dto.response.TodayResponse;
-import bunny.backend.bunny.dto.response.UpdateMonthTargetResponse;
+import bunny.backend.bunny.dto.response.*;
 import bunny.backend.common.ApiResponse;
 import bunny.backend.exception.BunnyException;
 import bunny.backend.member.domain.Member;
 import bunny.backend.member.domain.MemberRepository;
+import bunny.backend.salary.domain.Salary;
+import bunny.backend.salary.domain.SalaryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +31,7 @@ public class BunnyService {
     private final TargetRepository targetRepository;
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
+    private final SalaryRepository salaryRepository;
 
     // 이번달 목표 설정
     @Transactional
@@ -67,15 +66,33 @@ public class BunnyService {
         }
 
         targetRepository.save(target);
-        return ApiResponse.success(new MonthTargetResponse(targetListDto));
+        return ApiResponse.success(new MonthTargetResponse(target.getTotalTargetAmount(), targetListDto));
     }
 
     // 오늘의 버니 조회
     public ApiResponse<TodayResponse> todayBunny(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
+
+        Salary findSalary = salaryRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BunnyException("급여를 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+
+        double minMoney = findSalary.getMinMoney();
         LocalTime quttingTime = findMember.getQuittingTime();
-        return ApiResponse.success(new TodayResponse(quttingTime));
+        return ApiResponse.success(new TodayResponse(minMoney,quttingTime));
+    }
+    // 버니 홈 급여 조회
+    public ApiResponse<HomeMoneyResponse> findHomeMoney(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
+
+        Salary findSalary = salaryRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BunnyException("급여를 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+
+        double minMoney = findSalary.getMinMoney();
+        double hourMoney = findSalary.getHourMoney();
+        double secondMoney = findSalary.getSecondMoney();
+        return ApiResponse.success(new HomeMoneyResponse(minMoney,hourMoney,secondMoney));
     }
 
     // 한달 목표 수정
