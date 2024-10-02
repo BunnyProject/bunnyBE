@@ -5,6 +5,7 @@ import bunny.backend.bunny.domain.CategoryRepository;
 import bunny.backend.bunny.domain.Target;
 import bunny.backend.bunny.domain.TargetRepository;
 import bunny.backend.bunny.dto.process.TargetList;
+import bunny.backend.bunny.dto.process.UpdateTargetList;
 import bunny.backend.bunny.dto.request.MonthTargetRequest;
 import bunny.backend.bunny.dto.request.UpdateMonthTargetRequest;
 import bunny.backend.bunny.dto.response.DeleteTargetResponse;
@@ -48,6 +49,7 @@ public class BunnyService {
                     target.targetAmount()
             );
             targetList.add(category);
+            categoryRepository.save(category);
         }
 
         Target target = new Target();
@@ -57,7 +59,6 @@ public class BunnyService {
         List<TargetList> targetListDto = new ArrayList<>();
         for (Category category : targetList) {
             TargetList targetDto = new TargetList(
-                    category.getId(),
                     category.getCategoryName(),
                     category.getTargetAmount(),
                     category.getOnePrice()
@@ -77,47 +78,50 @@ public class BunnyService {
         return ApiResponse.success(new TodayResponse(quttingTime));
     }
 
-    // 버니 목표 수정
+    // 한달 목표 수정
     @Transactional
     public ApiResponse<UpdateMonthTargetResponse> updateMonthTarget(Long memberId, UpdateMonthTargetRequest request) {
+
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
         Target findTarget = targetRepository.findById(request.targetId())
                 .orElseThrow(() -> new BunnyException("이번달 목표를 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
-        // 해당 회원의 한달 목표 확인
         checkMemberRelationMonthTarget(findMember, findTarget);
 
-        List<Category> updatedCategoryList = new ArrayList<>();
+        List<TargetList> updatedTargetList = new ArrayList<>();
 
-        for (TargetList updateTarget : request.targetList()) {
+        for (UpdateTargetList updateTarget : request.updateTargetList()) {
 
-            List<Category> existingCategories = categoryRepository.findByMemberId(updateTarget.memberId());
-
-            Category existingCategory = existingCategories.stream()
-                    .filter(category -> Objects.equals(category.getMember().getId(), updateTarget.memberId()))
-                    .findFirst()
+            Category existingCategory = categoryRepository.findById(updateTarget.categoryId())
                     .orElseThrow(() -> new BunnyException("존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND));
 
-            existingCategory.setTargetAmount(updateTarget.targetAmount());
-            existingCategory.setOnePrice(updateTarget.onePrice());
+            if (!Objects.equals(existingCategory.getMember().getId(), memberId)) {
+                throw new BunnyException("해당 카테고리에 대한 권한이 없습니다.", HttpStatus.FORBIDDEN);
+            }
 
+            TargetList target = updateTarget.targetList().get(0);
+            existingCategory.setTargetAmount(target.targetAmount());
+            existingCategory.setOnePrice(target.onePrice());
+            existingCategory.setCategoryName(target.categoryName());
 
             categoryRepository.save(existingCategory);
-            updatedCategoryList.add(existingCategory);
+
+            updatedTargetList.add(new TargetList(
+                    existingCategory.getCategoryName(),
+                    existingCategory.getTargetAmount(),
+                    existingCategory.getOnePrice()
+            ));
         }
 
-        List<TargetList> targetListDto = updatedCategoryList.stream()
-                .map(category -> new TargetList(
-                        category.getMember().getId(),
-                        category.getCategoryName(),
-                        category.getTargetAmount(),
-                        category.getOnePrice()))
-                .collect(Collectors.toList());
+        findTarget.setTotalTargetAmount(request.totalTargetAmount());
+        targetRepository.save(findTarget);
 
-        return ApiResponse.success(new UpdateMonthTargetResponse(updatedCategoryList.getFirst().getTargetAmount(), targetListDto));
+        return ApiResponse.success(new UpdateMonthTargetResponse(findTarget.getTotalTargetAmount(), updatedTargetList));
     }
+
+
 
     // 목표 삭제
     public ApiResponse<DeleteTargetResponse> deleteTarget(Long memberId, Long targetId) {

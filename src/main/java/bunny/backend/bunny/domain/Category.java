@@ -43,4 +43,6 @@ public class Category extends BaseEntity {
     public void setOnePrice(Long onePrice) {
         this.onePrice = onePrice;
     }
+
+    public void setCategoryName(String categoryName) {this.categoryName = categoryName;}
 }
