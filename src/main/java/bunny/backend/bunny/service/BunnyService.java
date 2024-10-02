@@ -73,8 +73,13 @@ public class BunnyService {
     public ApiResponse<TodayResponse> todayBunny(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
+
+        Salary findSalary = salaryRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BunnyException("급여를 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+
+        double minMoney = findSalary.getMinMoney();
         LocalTime quttingTime = findMember.getQuittingTime();
-        return ApiResponse.success(new TodayResponse(quttingTime));
+        return ApiResponse.success(new TodayResponse(minMoney,quttingTime));
     }
     // 버니 홈 급여 조회
     public ApiResponse<HomeMoneyResponse> findHomeMoney(Long memberId) {
