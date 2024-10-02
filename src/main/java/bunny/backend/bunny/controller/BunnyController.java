@@ -2,10 +2,7 @@ package bunny.backend.bunny.controller;
 
 import bunny.backend.bunny.dto.request.MonthTargetRequest;
 import bunny.backend.bunny.dto.request.UpdateMonthTargetRequest;
-import bunny.backend.bunny.dto.response.DeleteTargetResponse;
-import bunny.backend.bunny.dto.response.MonthTargetResponse;
-import bunny.backend.bunny.dto.response.TodayResponse;
-import bunny.backend.bunny.dto.response.UpdateMonthTargetResponse;
+import bunny.backend.bunny.dto.response.*;
 import bunny.backend.bunny.service.BunnyService;
 import bunny.backend.common.ApiResponse;
 import org.springframework.http.server.RequestPath;
@@ -48,6 +45,12 @@ public class BunnyController {
             @PathVariable("targetId") Long targetId
     ) {
         return bunnyService.deleteTarget(memberId, targetId);
+    }
+    // 버니 홈 급여관련 조회
+    @GetMapping("/bunny/homeMoney")
+    public ApiResponse<HomeMoneyResponse> findHomeMoney(
+            @RequestHeader("member-no") Long memberId) {
+        return bunnyService.findHomeMoney(memberId);
     }
 
 }
