@@ -67,7 +67,7 @@ public class BunnyService {
         }
 
         targetRepository.save(target);
-        return ApiResponse.success(new MonthTargetResponse(targetListDto));
+        return ApiResponse.success(new MonthTargetResponse(target.getTotalTargetAmount(), targetListDto));
     }
 
     // 오늘의 버니 조회
