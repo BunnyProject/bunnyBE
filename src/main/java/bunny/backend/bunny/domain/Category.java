@@ -31,10 +31,8 @@ public class Category extends BaseEntity {
     @JoinColumn(name = "member_id",unique = true)
     private Member member;
 
-    public Category(String categoryName, Long onePrice, Member member,Long targetAmount) {
-        this.categoryName = categoryName;
+    public Category( Long onePrice,Long targetAmount) {
         this.onePrice = onePrice;
-        this.member = member;
         this.targetAmount = targetAmount;
     }
 
