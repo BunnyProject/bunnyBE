@@ -1,7 +1,6 @@
 package bunny.backend.bunny.dto.response;
 
 import bunny.backend.bunny.dto.process.TargetList;
-import bunny.backend.bunny.dto.process.UpdateTargetList;
 
 import java.util.List;
 
