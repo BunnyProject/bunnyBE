@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "category")
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +36,11 @@ public class Category extends BaseEntity {
         this.onePrice = onePrice;
         this.member = member;
         this.targetAmount = targetAmount;
+    }
+
+    public Category(String categoryName, Member member) {
+        this.categoryName = categoryName;
+        this.member = member;
     }
     public void setTargetAmount(Long targetAmount) {
         this.targetAmount = targetAmount;
