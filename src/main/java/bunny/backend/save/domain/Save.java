@@ -15,7 +15,7 @@ public class Save {
     Long id;
 
     @Column(name = "saving_chance")
-    int savingChance;
+    Integer savingChance;
 
     @Column(name = "saving_day")
     LocalDate savingDay;
@@ -26,4 +26,10 @@ public class Save {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id",unique = true)
     Category category;
+
+    public Save(double savingPrice,Category category, Integer savingChance) {
+        this.savingPrice = savingPrice;
+        this.savingChance = (savingChance != null) ? savingChance : 0;
+        this.category = category;
+    }
 }
