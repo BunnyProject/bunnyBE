@@ -13,12 +13,15 @@ import bunny.backend.save.dto.request.SavingMoneyRequest;
 import bunny.backend.save.dto.request.SettingSaveIconRequest;
 import bunny.backend.save.dto.response.SavingMoneyResponse;
 import bunny.backend.save.dto.response.SettingSaveIconResponse;
+import bunny.backend.save.dto.response.ShowSavingMoneyResponse;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,7 +30,7 @@ public class SaveService {
     private final CategoryRepository categoryRepository;
     private final SaveRepository saveRepository;
     private final MemberRepository memberRepository;
-
+    @Transactional
     // 아끼기 항목 설정
     public ApiResponse<SettingSaveIconResponse> settingSavingIcon(Long memberId, SettingSaveIconRequest request) {
 
@@ -48,7 +51,7 @@ public class SaveService {
 
         return ApiResponse.success(response);
     }
-
+    @Transactional
     // 아끼기 금액 설정
     public ApiResponse<SavingMoneyResponse> savingMoney(Long memberId, SavingMoneyRequest request) {
         Member findMember = memberRepository.findById(memberId)
@@ -84,5 +87,29 @@ public class SaveService {
         return ApiResponse.success(new SavingMoneyResponse(saveMoneyList));
     }
 
+    // 아끼기 추가한 금액 조회
+    public ApiResponse<ShowSavingMoneyResponse> showSavingMoney(Long memberId,Long savingId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+
+        List<Category> findCategory = categoryRepository.findByMemberId(memberId);
+        if (findCategory.isEmpty()) {
+            throw new BunnyException("항목을 찾을 수 없어요.",HttpStatus.NOT_FOUND);
+        }
+        Save findSave = saveRepository.findById(savingId)
+                .orElseThrow(() -> new BunnyException("항목에 대한 아끼기 금액을 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+
+        List<SaveMoney> saveMoneyListDto = new ArrayList<>();
+
+        SaveMoney saveMoneyDto = new SaveMoney(
+                findSave.getId(),
+                findCategory.getFirst().getCategoryName(),
+                findSave.getSavingChance(),
+                findSave.getSavingPrice()
+        );
+        saveMoneyListDto.add(saveMoneyDto);
+
+        return ApiResponse.success(new ShowSavingMoneyResponse(saveMoneyListDto));
+    }
 
 }

@@ -3,12 +3,14 @@ package bunny.backend.save.domain;
 import bunny.backend.bunny.domain.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
 @Table(name = "save")
+@NoArgsConstructor
 public class Save {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

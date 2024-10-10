@@ -5,12 +5,10 @@ import bunny.backend.save.dto.request.SavingMoneyRequest;
 import bunny.backend.save.dto.request.SettingSaveIconRequest;
 import bunny.backend.save.dto.response.SavingMoneyResponse;
 import bunny.backend.save.dto.response.SettingSaveIconResponse;
+import bunny.backend.save.dto.response.ShowSavingMoneyResponse;
 import bunny.backend.save.service.SaveService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -30,5 +28,15 @@ public class SaveController {
             @RequestBody SavingMoneyRequest request
             ) {
         return saveService.savingMoney(memberId,request);
+    }
+
+    // 추가한 아끼기 금액 조회
+    @GetMapping("/save/{savingId}")
+    public ApiResponse<ShowSavingMoneyResponse> showSavingMoney(
+            @RequestHeader("member-no")Long memberId,
+            @PathVariable("savingId")Long savingId
+    )
+    {
+        return saveService.showSavingMoney(memberId,savingId);
     }
 }
