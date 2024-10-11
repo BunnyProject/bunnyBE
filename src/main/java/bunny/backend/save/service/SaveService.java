@@ -12,10 +12,7 @@ import bunny.backend.save.dto.process.SaveMoney;
 import bunny.backend.save.dto.request.DeleteSaveMoneyRequest;
 import bunny.backend.save.dto.request.SavingMoneyRequest;
 import bunny.backend.save.dto.request.SettingSaveIconRequest;
-import bunny.backend.save.dto.response.DeleteSaveMoneyResponse;
-import bunny.backend.save.dto.response.SavingMoneyResponse;
-import bunny.backend.save.dto.response.SettingSaveIconResponse;
-import bunny.backend.save.dto.response.ShowSavingMoneyResponse;
+import bunny.backend.save.dto.response.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -96,7 +93,7 @@ public class SaveService {
         return ApiResponse.success(new SavingMoneyResponse(saveMoneyList));
     }
 
-    // 아끼기 추가한 금액 조회
+    // 아끼기 추가한 금액 조회 (개발 api용)
     // 카테고리 이름과 매칭 되는지 확인 로직 필요할듯
     public ApiResponse<ShowSavingMoneyResponse> showSavingMoney(Long memberId,Long savingId) {
         Member findMember = memberRepository.findById(memberId)
@@ -125,7 +122,7 @@ public class SaveService {
     // 아끼기 금액 삭제 - 삭제하면 통계에서도 삭제
     @Transactional
     public ApiResponse<DeleteSaveMoneyResponse> deleteSaveMoney(Long memberId,Long savingId,DeleteSaveMoneyRequest request) {
-        Member findmember = memberRepository.findById(memberId)
+        Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요", HttpStatus.NOT_FOUND));
 
         Save findSave = saveRepository.findById(savingId)
@@ -135,5 +132,27 @@ public class SaveService {
 
         return ApiResponse.success(new DeleteSaveMoneyResponse("아끼기가 삭제됐어요.",savingId));
     }
+
+    // 먼슬리 일정 조회
+    public List<ScheduleResponse> showMonthlySchedule(Long memberId, LocalDate startInclusive, LocalDate endInclusive) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요", HttpStatus.NOT_FOUND));
+
+        List<Save> saveList = saveRepository.findAllByMemberAndStartBetween(findMember, startInclusive, endInclusive);
+        List<ScheduleResponse> scheduleList = new ArrayList<>();
+
+        for (Save save : saveList) {
+            scheduleList.add(new ScheduleResponse(
+                    save.getId(),
+                    save.getCategory().getCategoryName(),
+                    save.getSavingChance(),
+                    save.getSavingDay(),
+                    save.getSavingPrice()
+            ));
+        }
+        return scheduleList;
+    }
+
+
 
 }

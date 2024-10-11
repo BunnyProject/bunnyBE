@@ -1,10 +1,12 @@
-package bunny.backend.save.dto.process;
+package bunny.backend.save.dto.response;
 
+import bunny.backend.save.dto.process.SaveMoney;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
+import java.util.List;
 
-public record SaveMoney(
+public record ScheduleResponse(
         Long savingId,
         String categoryName,
         Integer savingChance,

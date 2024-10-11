@@ -4,13 +4,15 @@ import bunny.backend.common.ApiResponse;
 import bunny.backend.save.dto.request.DeleteSaveMoneyRequest;
 import bunny.backend.save.dto.request.SavingMoneyRequest;
 import bunny.backend.save.dto.request.SettingSaveIconRequest;
-import bunny.backend.save.dto.response.DeleteSaveMoneyResponse;
-import bunny.backend.save.dto.response.SavingMoneyResponse;
-import bunny.backend.save.dto.response.SettingSaveIconResponse;
-import bunny.backend.save.dto.response.ShowSavingMoneyResponse;
+import bunny.backend.save.dto.response.*;
 import bunny.backend.save.service.SaveService;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
 
 @RestController
 @AllArgsConstructor
@@ -50,5 +52,16 @@ public class SaveController {
             @RequestBody DeleteSaveMoneyRequest request
             ) {
         return saveService.deleteSaveMoney(memberId,savingId,request);
+    }
+    // 먼슬리 일정 조회
+    @GetMapping("/save")
+    public ApiResponse<List<ScheduleResponse>> showMonthlySchedule(
+            @RequestHeader(value = "member-no", required = false) Long memberId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startInclusive,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endInclusive
+    ) {
+        List<ScheduleResponse> result = saveService.showMonthlySchedule(memberId, startInclusive, endInclusive);
+
+        return ApiResponse.success(result);
     }
 }
