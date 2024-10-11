@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,6 +60,7 @@ public class SaveService {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
+
         List<Category> findCategory = categoryRepository.findByMemberId(memberId);
         if (findCategory.isEmpty()) {
             throw new BunnyException("아끼기 항목을 찾을 수 없어요.", HttpStatus.NOT_FOUND);
@@ -69,9 +71,13 @@ public class SaveService {
                 .findFirst()
                 .orElseThrow(() -> new BunnyException("해당 카테고리를 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
+       // null일때 금액설정 날짜로 기본값 설정
+        LocalDate savingDay = (request.savingDay() != null) ? request.savingDay() : LocalDate.now();
+
         Save newSave = new Save(
                 request.savingPrice(),
                 category,
+                request.savingDay(),
                 request.savingChance()
         );
 
@@ -82,6 +88,7 @@ public class SaveService {
                     newSave.getId(),
                     newSave.getCategory().getCategoryName(),
                     newSave.getSavingChance(),
+                    newSave.getSavingDay(),
                     newSave.getSavingPrice());
 
             saveMoneyList.add(saveMoney);
@@ -108,6 +115,7 @@ public class SaveService {
                 findSave.getId(),
                 findCategory.getFirst().getCategoryName(),
                 findSave.getSavingChance(),
+                findSave.getSavingDay(),
                 findSave.getSavingPrice()
         );
         saveMoneyListDto.add(saveMoneyDto);
