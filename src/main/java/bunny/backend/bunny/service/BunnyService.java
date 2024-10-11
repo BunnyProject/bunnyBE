@@ -5,7 +5,6 @@ import bunny.backend.bunny.domain.CategoryRepository;
 import bunny.backend.bunny.domain.Target;
 import bunny.backend.bunny.domain.TargetRepository;
 import bunny.backend.bunny.dto.process.TargetList;
-import bunny.backend.bunny.dto.process.UpdateTargetList;
 import bunny.backend.bunny.dto.request.MonthTargetRequest;
 import bunny.backend.bunny.dto.request.UpdateMonthTargetRequest;
 import bunny.backend.bunny.dto.response.*;
@@ -41,14 +40,14 @@ public class BunnyService {
 
         List<Category> targetList = new ArrayList<>();
         for (TargetList target : request.targetList()) {
-            Category category = new Category(
-                    target.categoryName(),
-                    target.onePrice(),
-                    findMember,
-                    target.targetAmount()
-            );
-            targetList.add(category);
-            categoryRepository.save(category);
+            Category existingCategory = categoryRepository.findById(target.categoryId())
+                    .orElseThrow(() -> new BunnyException("존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND));
+
+            existingCategory.setTargetAmount(target.targetAmount());
+            existingCategory.setOnePrice(target.onePrice());
+
+            targetList.add(existingCategory);
+            categoryRepository.save(existingCategory);
         }
 
         Target target = new Target();
@@ -58,6 +57,7 @@ public class BunnyService {
         List<TargetList> targetListDto = new ArrayList<>();
         for (Category category : targetList) {
             TargetList targetDto = new TargetList(
+                    category.getId(),
                     category.getCategoryName(),
                     category.getTargetAmount(),
                     category.getOnePrice()
@@ -66,8 +66,9 @@ public class BunnyService {
         }
 
         targetRepository.save(target);
-        return ApiResponse.success(new MonthTargetResponse(target.getTotalTargetAmount(), targetListDto));
+        return ApiResponse.success(new MonthTargetResponse(target.getId(), target.getTotalTargetAmount(),targetListDto));
     }
+
 
     // 오늘의 버니 조회
     public ApiResponse<TodayResponse> todayBunny(Long memberId) {
@@ -109,7 +110,7 @@ public class BunnyService {
 
         List<TargetList> updatedTargetList = new ArrayList<>();
 
-        for (UpdateTargetList updateTarget : request.updateTargetList()) {
+        for (TargetList updateTarget : request.updateTargetList()) {
 
             Category existingCategory = categoryRepository.findById(updateTarget.categoryId())
                     .orElseThrow(() -> new BunnyException("존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND));
@@ -118,14 +119,14 @@ public class BunnyService {
                 throw new BunnyException("해당 카테고리에 대한 권한이 없습니다.", HttpStatus.FORBIDDEN);
             }
 
-            TargetList target = updateTarget.targetList().get(0);
-            existingCategory.setTargetAmount(target.targetAmount());
-            existingCategory.setOnePrice(target.onePrice());
-            existingCategory.setCategoryName(target.categoryName());
+            existingCategory.setTargetAmount(updateTarget.targetAmount());
+            existingCategory.setOnePrice(updateTarget.onePrice());
+            existingCategory.setCategoryName(updateTarget.categoryName());
 
             categoryRepository.save(existingCategory);
 
             updatedTargetList.add(new TargetList(
+                    existingCategory.getId(),
                     existingCategory.getCategoryName(),
                     existingCategory.getTargetAmount(),
                     existingCategory.getOnePrice()
