@@ -9,8 +9,10 @@ import bunny.backend.member.domain.MemberRepository;
 import bunny.backend.save.domain.Save;
 import bunny.backend.save.domain.SaveRepository;
 import bunny.backend.save.dto.process.SaveMoney;
+import bunny.backend.save.dto.request.DeleteSaveMoneyRequest;
 import bunny.backend.save.dto.request.SavingMoneyRequest;
 import bunny.backend.save.dto.request.SettingSaveIconRequest;
+import bunny.backend.save.dto.response.DeleteSaveMoneyResponse;
 import bunny.backend.save.dto.response.SavingMoneyResponse;
 import bunny.backend.save.dto.response.SettingSaveIconResponse;
 import bunny.backend.save.dto.response.ShowSavingMoneyResponse;
@@ -88,6 +90,7 @@ public class SaveService {
     }
 
     // 아끼기 추가한 금액 조회
+    // 카테고리 이름과 매칭 되는지 확인 로직 필요할듯
     public ApiResponse<ShowSavingMoneyResponse> showSavingMoney(Long memberId,Long savingId) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.",HttpStatus.NOT_FOUND));
@@ -110,6 +113,19 @@ public class SaveService {
         saveMoneyListDto.add(saveMoneyDto);
 
         return ApiResponse.success(new ShowSavingMoneyResponse(saveMoneyListDto));
+    }
+    // 아끼기 금액 삭제 - 삭제하면 통계에서도 삭제
+    @Transactional
+    public ApiResponse<DeleteSaveMoneyResponse> deleteSaveMoney(Long memberId,Long savingId,DeleteSaveMoneyRequest request) {
+        Member findmember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요", HttpStatus.NOT_FOUND));
+
+        Save findSave = saveRepository.findById(savingId)
+                .orElseThrow(() -> new BunnyException("항목에 대한 아끼기 금액을 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+
+        saveRepository.deleteById(savingId);
+
+        return ApiResponse.success(new DeleteSaveMoneyResponse("아끼기가 삭제됐어요.",savingId));
     }
 
 }

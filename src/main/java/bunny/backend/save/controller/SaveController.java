@@ -1,8 +1,10 @@
 package bunny.backend.save.controller;
 
 import bunny.backend.common.ApiResponse;
+import bunny.backend.save.dto.request.DeleteSaveMoneyRequest;
 import bunny.backend.save.dto.request.SavingMoneyRequest;
 import bunny.backend.save.dto.request.SettingSaveIconRequest;
+import bunny.backend.save.dto.response.DeleteSaveMoneyResponse;
 import bunny.backend.save.dto.response.SavingMoneyResponse;
 import bunny.backend.save.dto.response.SettingSaveIconResponse;
 import bunny.backend.save.dto.response.ShowSavingMoneyResponse;
@@ -38,5 +40,15 @@ public class SaveController {
     )
     {
         return saveService.showSavingMoney(memberId,savingId);
+    }
+
+    // 아끼기 삭제
+    @DeleteMapping("/save/{savingId}")
+    public ApiResponse<DeleteSaveMoneyResponse> deleteSaveMoney(
+            @RequestHeader("member-no")Long memberId,
+            @PathVariable("savingId")Long savingId,
+            @RequestBody DeleteSaveMoneyRequest request
+            ) {
+        return saveService.deleteSaveMoney(memberId,savingId,request);
     }
 }

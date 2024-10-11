@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface SaveRepository extends JpaRepository<Save,Long> {
     List<Save> findAllByCategoryIn(List<Category> categories);
+
 }
