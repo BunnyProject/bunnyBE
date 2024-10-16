@@ -143,7 +143,7 @@ public class SaveService {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요", HttpStatus.NOT_FOUND));
 
-        List<Save> saveList = saveRepository.findAllByMemberAndStartBetween(findMember, startInclusive, endInclusive);
+        List<Save> saveList = saveRepository.findAllByMemberAndSavingDayBetween(findMember, startInclusive, endInclusive);
         List<ScheduleResponse> scheduleList = new ArrayList<>();
 
         for (Save save : saveList) {
