@@ -2,6 +2,7 @@ package bunny.backend.save.domain;
 
 import bunny.backend.bunny.domain.Category;
 import bunny.backend.common.BaseEntity;
+import bunny.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,8 @@ public class Save extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id",unique = true)
     Category category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 
     public Save(double savingPrice,Category category,LocalDate savingDay,Integer savingChance) {
         this.savingPrice = savingPrice;

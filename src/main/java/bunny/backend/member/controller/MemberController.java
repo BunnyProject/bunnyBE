@@ -7,6 +7,7 @@ import bunny.backend.member.dto.response.CheckMemberNameResponse;
 import bunny.backend.member.dto.response.CreateMemberResponse;
 import bunny.backend.member.dto.response.FindMemberNameResponse;
 import bunny.backend.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,7 @@ public class MemberController {
 
     // 사용자 이름 중복체크
     @PostMapping("/user/check")
+    @Operation(summary = "사용자 닉네임 중복체크", description = "사용자 닉네임 중복체크하는 api입니다.")
     public ApiResponse<CheckMemberNameResponse> checkMemberName(
             @RequestBody CheckMemberNameRequest request
     ) {
@@ -27,6 +29,7 @@ public class MemberController {
 
     // 이름으로 사용자 조회
     @GetMapping("/user/find")
+    @Operation(summary = "사용자 닉네임으로 조회", description = "닉네임으로 사용자 조회하는 api입니다.")
     public ApiResponse<FindMemberNameResponse> findMember(
             @RequestParam(name = "name") String name
     ) {
@@ -35,6 +38,7 @@ public class MemberController {
 
     // 사용자 생성
     @PostMapping("/user")
+    @Operation(summary = "사용자 생성", description = "사용자 생성하는 api입니다.")
     public ApiResponse<CreateMemberResponse> createMember(
             @RequestBody CreateMemberRequest request
     ) {
@@ -43,6 +47,7 @@ public class MemberController {
 
     // 사용자 삭제
     @DeleteMapping("/user/{id}")
+    @Operation(summary = "사용자 삭제", description = "사용자 삭제하는 api입니다.")
     public ApiResponse<String> deleteMember(@PathVariable("id") Long id) {
         memberService.deleteMember(id);
         return ApiResponse.success("Member deleted: " + id);
