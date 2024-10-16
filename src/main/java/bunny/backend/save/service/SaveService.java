@@ -8,6 +8,7 @@ import bunny.backend.member.domain.Member;
 import bunny.backend.member.domain.MemberRepository;
 import bunny.backend.save.domain.Save;
 import bunny.backend.save.domain.SaveRepository;
+import bunny.backend.save.dto.process.DetailSaveMoney;
 import bunny.backend.save.dto.process.SaveMoney;
 import bunny.backend.save.dto.request.DeleteSaveMoneyRequest;
 import bunny.backend.save.dto.request.SavingMoneyRequest;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -30,6 +32,7 @@ public class SaveService {
     private final CategoryRepository categoryRepository;
     private final SaveRepository saveRepository;
     private final MemberRepository memberRepository;
+
     @Transactional
     // 아끼기 항목 설정
     public ApiResponse<SettingSaveIconResponse> settingSavingIcon(Long memberId, SettingSaveIconRequest request) {
@@ -39,7 +42,7 @@ public class SaveService {
 
         Category firstCategory = new Category(request.categoryName1(), findMember);
         categoryRepository.save(firstCategory);
-        Category secondCategory = new Category(request.categoryName2(),findMember);
+        Category secondCategory = new Category(request.categoryName2(), findMember);
         categoryRepository.save(secondCategory);
 
         Long firstCategoryId = firstCategory.getId();
@@ -51,6 +54,7 @@ public class SaveService {
 
         return ApiResponse.success(response);
     }
+
     @Transactional
     // 아끼기 금액 설정
     public ApiResponse<SavingMoneyResponse> savingMoney(Long memberId, SavingMoneyRequest request) {
@@ -68,7 +72,7 @@ public class SaveService {
                 .findFirst()
                 .orElseThrow(() -> new BunnyException("해당 카테고리를 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
-       // null일때 금액설정 날짜로 기본값 설정
+        // null일때 금액설정 날짜로 기본값 설정
         LocalDate savingDay = (request.savingDay() != null) ? request.savingDay() : LocalDate.now();
 
         Save newSave = new Save(
@@ -81,30 +85,30 @@ public class SaveService {
         saveRepository.save(newSave);
 
         List<SaveMoney> saveMoneyList = new ArrayList<>();
-            SaveMoney saveMoney = new SaveMoney(
-                    newSave.getId(),
-                    newSave.getCategory().getCategoryName(),
-                    newSave.getSavingChance(),
-                    newSave.getSavingDay(),
-                    newSave.getSavingPrice());
+        SaveMoney saveMoney = new SaveMoney(
+                newSave.getId(),
+                newSave.getCategory().getCategoryName(),
+                newSave.getSavingChance(),
+                newSave.getSavingDay(),
+                newSave.getSavingPrice());
 
-            saveMoneyList.add(saveMoney);
+        saveMoneyList.add(saveMoney);
 
         return ApiResponse.success(new SavingMoneyResponse(saveMoneyList));
     }
 
     // 아끼기 추가한 금액 조회 (개발 api용)
     // 카테고리 이름과 매칭 되는지 확인 로직 필요할듯
-    public ApiResponse<ShowSavingMoneyResponse> showSavingMoney(Long memberId,Long savingId) {
+    public ApiResponse<ShowSavingMoneyResponse> showSavingMoney(Long memberId, Long savingId) {
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
         List<Category> findCategory = categoryRepository.findByMemberId(memberId);
         if (findCategory.isEmpty()) {
-            throw new BunnyException("항목을 찾을 수 없어요.",HttpStatus.NOT_FOUND);
+            throw new BunnyException("항목을 찾을 수 없어요.", HttpStatus.NOT_FOUND);
         }
         Save findSave = saveRepository.findById(savingId)
-                .orElseThrow(() -> new BunnyException("항목에 대한 아끼기 금액을 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new BunnyException("항목에 대한 아끼기 금액을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
         List<SaveMoney> saveMoneyListDto = new ArrayList<>();
 
@@ -119,18 +123,19 @@ public class SaveService {
 
         return ApiResponse.success(new ShowSavingMoneyResponse(saveMoneyListDto));
     }
+
     // 아끼기 금액 삭제 - 삭제하면 통계에서도 삭제
     @Transactional
-    public ApiResponse<DeleteSaveMoneyResponse> deleteSaveMoney(Long memberId,Long savingId,DeleteSaveMoneyRequest request) {
+    public ApiResponse<DeleteSaveMoneyResponse> deleteSaveMoney(Long memberId, Long savingId, DeleteSaveMoneyRequest request) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요", HttpStatus.NOT_FOUND));
 
         Save findSave = saveRepository.findById(savingId)
-                .orElseThrow(() -> new BunnyException("항목에 대한 아끼기 금액을 찾을 수 없어요.",HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new BunnyException("항목에 대한 아끼기 금액을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
         saveRepository.deleteById(savingId);
 
-        return ApiResponse.success(new DeleteSaveMoneyResponse("아끼기가 삭제됐어요.",savingId));
+        return ApiResponse.success(new DeleteSaveMoneyResponse("아끼기가 삭제됐어요.", savingId));
     }
 
     // 먼슬리 일정 조회
@@ -153,6 +158,47 @@ public class SaveService {
         return scheduleList;
     }
 
-
-
+    // 세부 일정 조회
+//    public List<ApiResponse<TargetDayScheduleResponse>> showTargetSchedule(Long memberId, LocalDate targetDay) {
+//        Member findMember = memberRepository.findById(memberId)
+//                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
+//
+//        LocalDate nextDay = targetDay.plusDays(1); // 다음 날 00:00 전까지
+//        List<Save> list = saveRepository.findAllByMemberAndDate(findMember, targetDay, nextDay);
+//        List<ApiResponse<TargetDayScheduleResponse>> saveList = new ArrayList<>();
+//
+//        // 카테고리별로 그룹화: categoryName을 기준으로 그룹화
+//        Map<String, List<DetailSaveMoney>> groupedByCategory = list.stream()
+//                .flatMap(save -> save.getDetailSaveMoneyList().stream())
+//                .collect(Collectors.groupingBy(DetailSaveMoney::categoryName));
+//
+//        // 각 카테고리별로 처리
+//        for (Map.Entry<String, List<DetailSaveMoney>> entry : groupedByCategory.entrySet()) {
+//            String categoryName = entry.getKey();
+//            List<DetailSaveMoney> categoryItems = entry.getValue();
+//
+//            // 총 아낀 금액 계산
+//            double totalSavingMoney = categoryItems.stream()
+//                    .mapToDouble(DetailSaveMoney::savingPrice)
+//                    .sum();
+//
+//            // 횟수 계산
+//            int totalSavingCount = categoryItems.size();
+//
+//            // 카테고리별 세부 항목 리스트 생성
+//            List<TargetDayScheduleResponse> targetDayScheduleResponses = categoryItems.stream()
+//                    .map(detail -> new TargetDayScheduleResponse(
+//                            List.of(detail),
+//                            detail.savingPrice(),
+//                            1, // 각 항목에 대해 1회로 처리 (횟수는 각 항목당 1로 간주)
+//                            totalSavingMoney // 카테고리별 총 금액
+//                    ))
+//                    .collect(Collectors.toList());
+//
+//            // ApiResponse로 감싸서 추가
+//            saveList.add(new ApiResponse<>(targetDayScheduleResponses));
+//        }
+//
+//        return saveList;
+//    }
 }
