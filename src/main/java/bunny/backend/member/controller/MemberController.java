@@ -8,9 +8,11 @@ import bunny.backend.member.dto.response.CreateMemberResponse;
 import bunny.backend.member.dto.response.FindMemberNameResponse;
 import bunny.backend.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Tag(name = "사용자 서비스 모음", description = "사용자 관련한 API 입니다.")
 public class MemberController {
     private final MemberService memberService;
 

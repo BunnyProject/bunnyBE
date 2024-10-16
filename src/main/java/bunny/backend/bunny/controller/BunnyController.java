@@ -6,10 +6,12 @@ import bunny.backend.bunny.dto.response.*;
 import bunny.backend.bunny.service.BunnyService;
 import bunny.backend.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.server.RequestPath;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Tag(name = "버니 서비스 모음", description = "버니 관련한 API 입니다.")
 public class BunnyController {
     private final BunnyService bunnyService;
 
