@@ -5,6 +5,7 @@ import bunny.backend.bunny.domain.CategoryRepository;
 import bunny.backend.bunny.domain.Target;
 import bunny.backend.bunny.domain.TargetRepository;
 import bunny.backend.bunny.dto.process.TargetList;
+import bunny.backend.bunny.dto.process.UpdateTargetList;
 import bunny.backend.bunny.dto.request.MonthTargetRequest;
 import bunny.backend.bunny.dto.request.UpdateMonthTargetRequest;
 import bunny.backend.bunny.dto.response.*;
@@ -130,9 +131,9 @@ public class BunnyService {
 
         checkMemberRelationMonthTarget(findMember, findTarget);
 
-        List<TargetList> updatedTargetList = new ArrayList<>();
+        List<UpdateTargetList> updatedTargetList = new ArrayList<>();
 
-        for (TargetList updateTarget : request.updateTargetList()) {
+        for (UpdateTargetList updateTarget : request.updateTargetList()) {
 
             Category existingCategory = categoryRepository.findById(updateTarget.categoryId())
                     .orElseThrow(() -> new BunnyException("존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND));
@@ -143,16 +144,14 @@ public class BunnyService {
 
             existingCategory.setTargetAmount(updateTarget.targetAmount());
             existingCategory.setOnePrice(updateTarget.onePrice());
-            existingCategory.setCategoryName(updateTarget.categoryName());
 
             categoryRepository.save(existingCategory);
 
-            updatedTargetList.add(new TargetList(
+            updatedTargetList.add(new UpdateTargetList(
                     existingCategory.getId(),
-                    existingCategory.getCategoryName(),
                     existingCategory.getTargetAmount(),
                     existingCategory.getOnePrice()
-            ));
+                    ));
         }
 
         findTarget.setTotalTargetAmount(request.totalTargetAmount());
