@@ -38,15 +38,35 @@ public class BunnyService {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
+        Long firstCategoryId = request.targetList().get(0).categoryId();
+        Long secondCategoryId = request.targetList().get(1).categoryId();
+
+        Category firstCategory = categoryRepository.findById(firstCategoryId)
+                .orElseThrow(() -> new BunnyException("첫 번째 카테고리가 존재하지 않습니다.", HttpStatus.NOT_FOUND));
+
+        Category secondCategory = categoryRepository.findById(secondCategoryId)
+                .orElseThrow(() -> new BunnyException("두 번째 카테고리가 존재하지 않습니다.", HttpStatus.NOT_FOUND));
+
         List<Category> targetList = new ArrayList<>();
+
         for (TargetList target : request.targetList()) {
-            Category existingCategory = categoryRepository.findById(target.categoryId())
-                    .orElseThrow(() -> new BunnyException("존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND));
+            Long categoryId = target.categoryId();
+            Category existingCategory;
+
+            if (categoryId.equals(firstCategoryId)) {
+                existingCategory = firstCategory;
+            } else if (categoryId.equals(secondCategoryId)) {
+                existingCategory = secondCategory;
+            } else {
+
+                throw new BunnyException("유효하지 않은 카테고리입니다.", HttpStatus.BAD_REQUEST);
+            }
 
             existingCategory.setTargetAmount(target.targetAmount());
             existingCategory.setOnePrice(target.onePrice());
 
             targetList.add(existingCategory);
+
             categoryRepository.save(existingCategory);
         }
 
@@ -66,8 +86,10 @@ public class BunnyService {
         }
 
         targetRepository.save(target);
-        return ApiResponse.success(new MonthTargetResponse(target.getId(), target.getTotalTargetAmount(),targetListDto));
-    }
+
+        return ApiResponse.success(new MonthTargetResponse(target.getId(), target.getTotalTargetAmount(), targetListDto));
+
+}
 
 
     // 오늘의 버니 조회
