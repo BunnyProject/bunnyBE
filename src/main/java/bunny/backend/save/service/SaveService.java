@@ -83,7 +83,9 @@ public class SaveService {
         LocalDate savingDay = (request.savingDay() != null) ? request.savingDay() : LocalDate.now();
 
         Save newSave = new Save(
+                findMember,
                 request.savingPrice(),
+                request.detail(),
                 category,
                 request.savingDay(),
                 request.savingChance()
@@ -94,6 +96,7 @@ public class SaveService {
         List<SaveMoney> saveMoneyList = new ArrayList<>();
         SaveMoney saveMoney = new SaveMoney(
                 newSave.getId(),
+                newSave.getDetail(),
                 newSave.getCategory().getCategoryName(),
                 newSave.getSavingChance(),
                 newSave.getSavingDay(),
@@ -122,6 +125,7 @@ public class SaveService {
         SaveMoney saveMoneyDto = new SaveMoney(
                 findSave.getId(),
                 findCategory.getFirst().getCategoryName(),
+                findSave.getDetail(),
                 findSave.getSavingChance(),
                 findSave.getSavingDay(),
                 findSave.getSavingPrice()
@@ -177,6 +181,7 @@ public class SaveService {
                 .map(save -> new DetailSaveMoney(
                         save.getId(),
                         save.getCategory().getId(),
+                        save.getDetail(),
                         save.getCategory().getCategoryName(),
                         save.getSavingPrice()
                 ))
