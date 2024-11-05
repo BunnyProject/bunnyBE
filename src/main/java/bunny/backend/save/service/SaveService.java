@@ -82,13 +82,15 @@ public class SaveService {
         // null일때 금액설정 날짜로 기본값 설정
         LocalDate savingDay = (request.savingDay() != null) ? request.savingDay() : LocalDate.now();
 
+        List<Save> existSave = saveRepository.findByMemberIdAndCategoryIdAndSavingDay(memberId, category.getId(), savingDay);
+
         Save newSave = new Save(
                 findMember,
                 request.savingPrice(),
                 request.detail(),
                 category,
                 request.savingDay(),
-                request.savingChance()
+                existSave.isEmpty() ? 1 : (existSave.get(0).getSavingChance() + 1)
         );
 
         saveRepository.save(newSave);

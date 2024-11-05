@@ -15,4 +15,7 @@ public interface SaveRepository extends JpaRepository<Save,Long> {
     List<Save> findAllByMemberAndSavingDayBetween(Member member, LocalDate startInclusive, LocalDate endInclusive);
     @Query("SELECT s FROM Save s WHERE  s.savingDay >= :targetDay AND s.savingDay < :nextDay")
     List<Save> findAllByMemberAndDate(Member member, LocalDate targetDay, LocalDate nextDay);
+
+    List<Save> findByMemberIdAndCategoryIdAndSavingDay(Long memberId, Long categoryId, LocalDate savingDay);
+
 }
