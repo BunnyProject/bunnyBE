@@ -1,7 +1,7 @@
 package bunny.backend.member.domain;
 
 import bunny.backend.common.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import bunny.backend.salary.domain.Salary;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,11 +44,9 @@ public class Member extends BaseEntity {
     private List<DayOfWeek> workDay;
 
     @Column(name = "working_time", nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime workingTime;
 
     @Column(name = "quitting_time", nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime quittingTime;
 
     public Member(String name, LocalDate birth, Gender gender, Job job, double monthMoney, List<DayOfWeek> workDay, LocalTime workingTime, LocalTime quittingTime) {

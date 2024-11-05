@@ -18,6 +18,9 @@ public class Category extends BaseEntity {
     @Column(name = "category_name")
     private String categoryName;
 
+    @Column(name = "detail")
+    private String detail;
+
     @Column(name = "one_price")
     private Long onePrice;
 

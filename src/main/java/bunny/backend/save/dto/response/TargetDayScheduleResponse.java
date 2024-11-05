@@ -1,6 +1,5 @@
 package bunny.backend.save.dto.response;
 
-import bunny.backend.save.dto.process.CategorySavingChance;
 import bunny.backend.save.dto.process.DetailSaveMoney;
 
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.List;
 public record TargetDayScheduleResponse(
         List<DetailSaveMoney> detailSaveMoneyList,
         double totalSavingMoney,
-        List<CategorySavingChance> savingChanceList,
+        double totalSavingChance,
         double totalCategorySavingMoney
 
 

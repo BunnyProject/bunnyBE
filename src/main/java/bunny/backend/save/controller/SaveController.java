@@ -22,9 +22,9 @@ import java.util.List;
 public class SaveController {
     private final SaveService saveService;
 
-    // 아끼기 항목 설정 - 항목 변경하는 API필요 ?
+    // 아끼기 항목 설정
     @PostMapping("/save/icon")
-    @Operation(summary = "아끼기 항목 설정", description = "아끼기 항목을 설정하는 API입니다. - 항목을 먼저 설정 후 한달 목표 설정해야함")
+    @Operation(summary = "아끼기 항목 설정", description = "아끼기 항목을 설정하는 API입니다.")
     public ApiResponse<SettingSaveIconResponse> settingSaveIcon(
             @RequestHeader("member-no")Long memberId, @RequestBody SettingSaveIconRequest request) {
         return saveService.settingSavingIcon(memberId,request);
@@ -65,20 +65,13 @@ public class SaveController {
     @Operation(summary = "먼슬리 아끼기 조회", description = "한달 단위로 아낀 내역을 확인할 수 있는 API입니다.")
     public ApiResponse<List<ScheduleResponse>> showMonthlySchedule(
             @RequestHeader(value = "member-no", required = false) Long memberId,
-            @RequestParam(name = "startInclusive") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,pattern = "yyyy-MM-dd") LocalDate startInclusive,
-            @RequestParam(name = "endInclusive") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,pattern = "yyyy-MM-dd") LocalDate endInclusive
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startInclusive,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endInclusive
     ) {
         List<ScheduleResponse> result = saveService.showMonthlySchedule(memberId, startInclusive, endInclusive);
 
         return ApiResponse.success(result);
     }
     // 상세 일정 조회
-    @GetMapping("/save/detail")
-    @Operation(summary = "아끼기 상세 스케줄 조회",description = "타겟 날짜를 선택해 아낀 내역을 확인할 수 있는 API입니다.")
-    public ApiResponse<TargetDayScheduleResponse> showTargetSchedule(
-            @RequestHeader(value = "member-no",required = false) Long memberId,
-            @RequestParam(name = "targetDay") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,pattern = "yyyy-MM-dd")LocalDate targetDay)
-    {
-    return saveService.showTargetSchedule(memberId,targetDay);
-    }
+
 }
