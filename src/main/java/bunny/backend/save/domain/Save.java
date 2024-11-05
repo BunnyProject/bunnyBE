@@ -27,14 +27,21 @@ public class Save extends BaseEntity {
     @Column(name = "saving_price")
     double savingPrice;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id",unique = true)
-    Category category;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public Save(double savingPrice,Category category,LocalDate savingDay,Integer savingChance) {
+    @Column(name="detail")
+    String detail;
+
+    public Save(Member member,double savingPrice,String detail,Category category,LocalDate savingDay,Integer savingChance) {
+        this.member = member;
         this.savingPrice = savingPrice;
+        this.detail = detail;
         this.savingChance = (savingChance != null) ? savingChance : 0;
         this.category = category;
         this.savingDay = savingDay;

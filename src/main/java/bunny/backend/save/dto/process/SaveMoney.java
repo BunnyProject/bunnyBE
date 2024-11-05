@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 public record SaveMoney(
         Long savingId,
+        String detail,
         String categoryName,
         Integer savingChance,
         @JsonFormat(pattern = "yyyy-MM-dd")
