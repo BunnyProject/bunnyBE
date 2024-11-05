@@ -42,7 +42,6 @@ public class SaveService {
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
 
         // 기타 항목 없으면 자동 생성되도록
-
         Category otherCategory = categoryRepository.findByMemberAndCategoryName(findMember, "기타")
                 .orElseGet(() -> {
                     Category newOtherCategory = new Category("기타", findMember);
@@ -58,18 +57,17 @@ public class SaveService {
         Long secondCategoryId = secondCategory.getId();
 
         SettingSaveIconResponse response = new SettingSaveIconResponse(
-                firstCategoryId, secondCategoryId, firstCategory.getCategoryName(), secondCategory.getCategoryName()
+                firstCategoryId, firstCategory.getCategoryName(), secondCategoryId,secondCategory.getCategoryName(), otherCategory.getId(), otherCategory.getCategoryName()
         );
 
         return ApiResponse.success(response);
     }
 
     @Transactional
-    // 아끼기 금액 설정 - 기타 항목 관련 수정 필요 : 기타항목은 디폴드 값으로 갖고있기 ?
+    // 아끼기 금액 설정
     public ApiResponse<SavingMoneyResponse> savingMoney(Long memberId, SavingMoneyRequest request) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
-
 
         List<Category> findCategory = categoryRepository.findByMemberId(memberId);
         if (findCategory.isEmpty()) {
