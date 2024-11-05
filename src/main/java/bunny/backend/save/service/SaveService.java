@@ -82,7 +82,7 @@ public class SaveService {
         // null일때 금액설정 날짜로 기본값 설정
         LocalDate savingDay = (request.savingDay() != null) ? request.savingDay() : LocalDate.now();
 
-        List<Save> existSave = saveRepository.findByMemberIdAndCategoryIdAndSavingDay(memberId, category.getId(), savingDay);
+        List<Save> existSave = saveRepository.findByMemberIdAndCategoryIdAndSavingDay(memberId, category.getId(), savingDay); // 날짜순 정렬
 
         Save newSave = new Save(
                 findMember,
@@ -156,7 +156,7 @@ public class SaveService {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요", HttpStatus.NOT_FOUND));
 
-        List<Save> saveList = saveRepository.findAllByMemberAndSavingDayBetween(findMember, startInclusive, endInclusive);
+        List<Save> saveList = saveRepository.findAllByMemberAndSavingDayBetweenOrderBySavingDayAsc(findMember, startInclusive, endInclusive);
         List<ScheduleResponse> scheduleList = new ArrayList<>();
 
         for (Save save : saveList) {

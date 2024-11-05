@@ -18,4 +18,6 @@ public interface SaveRepository extends JpaRepository<Save,Long> {
 
     List<Save> findByMemberIdAndCategoryIdAndSavingDay(Long memberId, Long categoryId, LocalDate savingDay);
 
+    List<Save> findAllByMemberAndSavingDayBetweenOrderBySavingDayAsc(Member member, LocalDate start, LocalDate end);
+
 }
