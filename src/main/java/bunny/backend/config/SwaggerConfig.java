@@ -9,6 +9,5 @@ import io.swagger.v3.oas.annotations.info.Info;
                 description = "백엔드 API")
 )
 @Configuration
-
 public class SwaggerConfig {
 }
