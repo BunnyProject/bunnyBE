@@ -35,7 +35,6 @@ public class Save extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-
     @Column(name="detail")
     String detail;
 
