@@ -25,7 +25,7 @@ public class Category extends BaseEntity {
     private Long targetAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id",unique = true)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     public Category( Long onePrice,Long targetAmount) {
