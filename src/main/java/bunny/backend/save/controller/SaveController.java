@@ -71,7 +71,7 @@ public class SaveController {
     return saveService.showTargetSchedule(memberId,targetDay);
     }
     // 오늘 아끼기 내역 조회
-    @GetMapping("/save/todaySaving")
+    @GetMapping("/save/today-saving")
     @Operation(summary = "오늘 아끼기 전체 조회",description = "오늘 아끼기를 전체조회하는 API입니다. / 최근 버튼 누른 순서대로 정렬")
     public ApiResponse<TodaySavingIconResponse> showTodaySavingIcon(
             @RequestHeader(value = "member-no",required = false) Long memberId
