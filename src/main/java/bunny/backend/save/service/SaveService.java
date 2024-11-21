@@ -11,11 +11,14 @@ import bunny.backend.save.domain.SaveRepository;
 import bunny.backend.save.dto.process.CategorySavingChance;
 import bunny.backend.save.dto.process.DetailSaveMoney;
 import bunny.backend.save.dto.process.SaveMoney;
+import bunny.backend.save.dto.process.TodaySavingCategory;
 import bunny.backend.save.dto.request.DeleteSaveMoneyRequest;
 import bunny.backend.save.dto.request.SavingMoneyRequest;
 import bunny.backend.save.dto.request.SettingSaveIconRequest;
 import bunny.backend.save.dto.response.*;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -197,6 +200,58 @@ public class SaveService {
                 totalSavingMoney
         );
 
+        return ApiResponse.success(response);
+    }
+
+    // 오늘의 아끼기 api - 버튼 누른 순서대로 정렬해서 보여져야함
+    public ApiResponse<TodaySavingIconResponse> showTodaySavingIcon(Long memberId) {
+
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
+
+        List<Save> saves = saveRepository.findAllByMemberId(memberId);
+
+        Map<String, List<Save>> groupedSaves = saves.stream()
+                .collect(Collectors.groupingBy(save -> save.getCategory().getCategoryName()));
+
+        LocalDate today = LocalDate.now();
+
+        List<Save> todaySaves = saves.stream()
+                .filter(save -> {
+                    LocalDateTime createdAt = save.getCreatedAt();
+                    return createdAt != null && createdAt.toLocalDate().isEqual(today);
+                })
+                .collect(Collectors.toList());
+
+
+        List<TodaySavingCategory> todaySavingCategoryList = groupedSaves.entrySet().stream()
+                .map(entry -> {
+                    String categoryName = entry.getKey();
+                    List<Save> categorySaves = entry.getValue();
+
+                    // 정렬 오름차순
+                    categorySaves.sort(Comparator.comparing(Save::getCreatedAt).reversed());
+
+                    double totalSavingChance = categorySaves.size();
+                    double totalSavingCategoryMoney = categorySaves.stream()
+                            .mapToDouble(Save::getSavingPrice)
+                            .sum();
+
+                    return new TodaySavingCategory(
+                            categorySaves.get(0).getCategory().getId(),
+                            categoryName,
+                            totalSavingChance,
+                            totalSavingCategoryMoney
+                    );
+                })
+                .sorted(Comparator.comparing(TodaySavingCategory::totalSavingChance).reversed()) // 버튼 순서대로 정렬
+                .toList();
+
+        double todayTotalMoney = todaySavingCategoryList.stream()
+                .mapToDouble(TodaySavingCategory::totalSavingCategoryMoney)
+                .sum();
+
+        TodaySavingIconResponse response = new TodaySavingIconResponse(todayTotalMoney, todaySavingCategoryList);
         return ApiResponse.success(response);
     }
 
