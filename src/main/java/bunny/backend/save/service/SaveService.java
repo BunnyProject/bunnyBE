@@ -109,33 +109,6 @@ public class SaveService {
         return ApiResponse.success(new SavingMoneyResponse(saveMoneyList));
     }
 
-    // 아끼기 추가한 금액 조회 (개발 api용)
-    // 카테고리 이름과 매칭 되는지 확인 로직 필요할듯
-    public ApiResponse<ShowSavingMoneyResponse> showSavingMoney(Long memberId, Long savingId) {
-        Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new BunnyException("회원을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
-
-        List<Category> findCategory = categoryRepository.findByMemberId(memberId);
-        if (findCategory.isEmpty()) {
-            throw new BunnyException("항목을 찾을 수 없어요.", HttpStatus.NOT_FOUND);
-        }
-        Save findSave = saveRepository.findById(savingId)
-                .orElseThrow(() -> new BunnyException("항목에 대한 아끼기 금액을 찾을 수 없어요.", HttpStatus.NOT_FOUND));
-
-        List<SaveMoney> saveMoneyListDto = new ArrayList<>();
-
-        SaveMoney saveMoneyDto = new SaveMoney(
-                findSave.getId(),
-                findCategory.getFirst().getCategoryName(),
-                findSave.getDetail(),
-                findSave.getSavingChance(),
-                findSave.getSavingDay(),
-                findSave.getSavingPrice()
-        );
-        saveMoneyListDto.add(saveMoneyDto);
-
-        return ApiResponse.success(new ShowSavingMoneyResponse(saveMoneyListDto));
-    }
 
     // 아끼기 금액 삭제 - 삭제하면 통계에서도 삭제
     @Transactional
