@@ -39,17 +39,6 @@ public class SaveController {
         return saveService.savingMoney(memberId,request);
     }
 
-    // 추가한 아끼기 금액 조회
-    @GetMapping("/save/{savingId}")
-    @Operation(summary = "추가한 아끼기 금액 조회", description = "아낀 금액을 조회하는 API입니다.")
-    public ApiResponse<ShowSavingMoneyResponse> showSavingMoney(
-            @RequestHeader("member-no")Long memberId,
-            @PathVariable("savingId")Long savingId
-    )
-    {
-        return saveService.showSavingMoney(memberId,savingId);
-    }
-
     // 아끼기 삭제
     @DeleteMapping("/save/{savingId}")
     @Operation(summary = "아낀 내역 삭제", description = "아낀 내역을 삭제하는 API입니다.")
