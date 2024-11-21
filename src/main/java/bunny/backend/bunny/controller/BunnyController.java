@@ -55,7 +55,7 @@ public class BunnyController {
     }
     // 버니 홈 급여관련 조회
     @GetMapping("/bunny/homeMoney")
-    @Operation(summary = "홈화면 급여 조회", description = "현재 얼마나 벌고 있는지 확인할 수 있는 api입니다.")
+    @Operation(summary = "홈화면 급여 조회", description = "현재 얼마나 벌고 있는지 확인할 수 있는 api입니다./ 사용자 급여 조회 실행 후에 볼 수 있습니다.")
     public ApiResponse<HomeMoneyResponse> findHomeMoney(
             @RequestHeader("member-no") Long memberId) {
         return bunnyService.findHomeMoney(memberId);
