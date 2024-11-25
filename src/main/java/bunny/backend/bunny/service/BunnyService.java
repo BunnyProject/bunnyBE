@@ -103,7 +103,8 @@ public class BunnyService {
 
         double minMoney = findSalary.getMinMoney();
         LocalTime quttingTime = findMember.getQuittingTime();
-        return ApiResponse.success(new TodayResponse(minMoney,quttingTime));
+        LocalTime workingTime = findMember.getWorkingTime();
+        return ApiResponse.success(new TodayResponse(minMoney,workingTime,quttingTime));
     }
     // 버니 홈 급여 조회
     public ApiResponse<HomeMoneyResponse> findHomeMoney(Long memberId) {
