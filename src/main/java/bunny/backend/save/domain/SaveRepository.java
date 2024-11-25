@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface SaveRepository extends JpaRepository<Save,Long> {
-    List<Save> findAllByCategoryIn(List<Category> categories);
+    List<Save> findAllByMemberId(Long memberId);
     List<Save> findAllByMemberAndSavingDayBetween(Member member, LocalDate startInclusive, LocalDate endInclusive);
     @Query("SELECT s FROM Save s WHERE s.member = :member AND s.savingDay >= :targetDay AND s.savingDay < :nextDay")
     List<Save> findAllByMemberAndDate(
