@@ -44,7 +44,7 @@ public class MemberController {
     public ApiResponse<CreateMemberResponse> createMember(
             @RequestBody CreateMemberRequest request
     ) {
-        return memberService.createMember(request);
+        return ApiResponse.success(memberService.createMember(request));
     }
 
     // 사용자 삭제

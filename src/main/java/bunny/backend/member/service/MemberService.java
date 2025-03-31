@@ -12,6 +12,7 @@ import bunny.backend.member.dto.response.CreateMemberResponse;
 import bunny.backend.member.dto.response.FindMemberNameResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MemberService {
@@ -34,21 +35,22 @@ public class MemberService {
             throw new BunnyException("이름이 중복되었습니다", HttpStatus.BAD_REQUEST);
         }
     }
+    @Transactional
+    public CreateMemberResponse createMember(CreateMemberRequest request) {
+        checkMemberName(request.memberName());
+        MemberName memberName = new MemberName(request.memberName());
+        Member newMember = request.toEntity(memberName);
+        memberRepository.save(newMember);
+        return CreateMemberResponse.from(newMember);
+    }
     // 이름으로 멤버 조회
+
     public ApiResponse<FindMemberNameResponse> findMember(String name){
         Member member = memberRepository.findByMemberName(new MemberName(name));
         if(member == null){
             throw new BunnyException("존재하지 않는 이름입니다.", HttpStatus.BAD_REQUEST);
         }
         return ApiResponse.success(new FindMemberNameResponse(member.getId(), member.getMemberName().getName()));
-    }
-
-    public ApiResponse<CreateMemberResponse> createMember(CreateMemberRequest request) {
-        checkMemberName(request.memberName());
-        MemberName memberName = new MemberName(request.memberName());
-       Member newMember = request.toEntity(memberName);
-        memberRepository.save(newMember);
-        return ApiResponse.success(new CreateMemberResponse(newMember.getMemberName().getName(), newMember.getId()));
     }
     // 유저 삭제
     public void deleteMember(Long id) {
