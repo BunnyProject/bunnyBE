@@ -42,21 +42,13 @@ public class MemberService {
         }
         return ApiResponse.success(new FindMemberNameResponse(member.getId(), member.getMemberName().getName()));
     }
-    // 유저 생성
+
     public ApiResponse<CreateMemberResponse> createMember(CreateMemberRequest request) {
-        checkMemberName(request.name());
-        Member member = new Member(
-                request.name(),
-                request.birth(),
-                request.gender(),
-                request.job(),
-                request.monthMoney(),
-                request.workDay(),
-                request.workingTime(),
-                request.quittingTime()
-        );
-        memberRepository.save(member);
-        return ApiResponse.success(new CreateMemberResponse(member.getMemberName().getName(), member.getId()));
+        checkMemberName(request.memberName());
+        MemberName memberName = new MemberName(request.memberName());
+       Member newMember = request.toEntity(memberName);
+        memberRepository.save(newMember);
+        return ApiResponse.success(new CreateMemberResponse(newMember.getMemberName().getName(), newMember.getId()));
     }
     // 유저 삭제
     public void deleteMember(Long id) {

@@ -2,9 +2,11 @@ package bunny.backend.member.domain;
 
 import bunny.backend.exception.BunnyException;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberName {
     private String name;
